@@ -1,0 +1,6 @@
+# Where the compass should point
+# default = points to the "static_spawnpoint" setting coordinates or to 0,0,0 if nothing set
+# sethome = points to the players home from sethome mod, default as fallback
+# beds = points to the players spawn point trough the beds mod, default as fallback
+# origin = points to the individual compass origin that means the place the compass was crafted or picked first time
+compass_mode (Compass Mode) string default
