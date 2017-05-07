@@ -29,8 +29,12 @@ local function get_compass_stack(player, stack)
 	local angle_dir = 90 - math.deg(dir)
 	local angle_relative = (angle_north - angle_dir) % 360
 	local compass_image = math.floor((angle_relative/30) + 0.5)%12
+	local meta = stack:get_metadata()
 
-	return "compass:"..compass_image.." 1 0 "..stack:get_metadata()
+	local newstack = ItemStack("compass:"..compass_image)
+	--meta:set_string("description", "Compass to "..minetest.pos_to_string(spawn)) -- does not work on stable 0.4.15
+	newstack:set_metadata(meta)
+	return newstack
 end
 
 -- update inventory
