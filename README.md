@@ -29,7 +29,9 @@ The mod support the next settings:
 1. It is possible to change compass settings from other mods by changing values in global table ccompass. So it is possible for example to add a waypoint node to the target-nodes by
 
 ```
-    ccompass.restrict_target_nodes[nodename] = true
+	ccompass.recalibrate = true
+	ccompass.restrict_target = true
+	ccompass.restrict_target_nodes["schnitzeljagd:waypoint"] = true
 ```
 
 2. The pointed node metadata will be checked for "waypoint_name" attribute. It this attribute is set, the calibration screen take this string as proposal. This can be used for a game specific calibration node. To get it working working just set in node definition something like
@@ -38,21 +40,32 @@ The mod support the next settings:
           after_place_node = function(pos, placer)
              local meta = minetest.get_meta(pos)
              meta:set_string("waypoint_name", "the unique and wunderfull place")
+             meta:set_string("waypoint_pos", minetest.pos_to_string(target_pos)) -- if an other position should be the target instead of the node position
+             meta:set_string("waypoint_skip_namechange", "skip") -- do not ask for the waypoint name
           end,
 ```
 
 3. It is possible to create pre-calibrated compasses trough other mods. Just write the position to the Itemstack meta:
 
 ```
-    local stack = ItemStack("ccompass:0")
     stack:get_meta():set_string("target_pos", minetest.pos_to_string(pos))
+```
+
+    Recalibration related to a user should be done by function call
+```
+    local stack = ItemStack("ccompass:0")
+    ccompass.set_target(stack, {
+             target_pos_string = minetest.pos_to_string(pos),
+             target_name = waypoint_name,
+             playername = player:get_player_name()
+    })
 ```
 
 
 4. Each time the compass is updated, a hook is called, if defined in other mod. The hook is usefull to implement wear or any other compass manipulation logic.
 ```
     function ccompass.usage_hook(compass_stack, player)
-        --do anything with compasS_stack
+        --do anything with compass_stack
         return modified_compass_stack
     end
 ```
