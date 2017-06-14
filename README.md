@@ -1,14 +1,14 @@
 # ccompass
 
-This minetest mod adds a calibratable compass to the minetest.
+This minetest mod adds a calibratable compass to the minetest. Original mod [here](https://forum.minetest.net/viewtopic.php?f=11&t=3785)
 
-  - License - as the original mod (https://forum.minetest.net/viewtopic.php?f=11&t=3785): Code: WTFPL, textures: CC BY-SA
+  - License: Code: WTFPL, textures: CC BY-SA, sound: CC0.
   - Dependencies to other mods: none
   - Forum: https://forum.minetest.net/viewtopic.php?f=9&t=17881
-  
+
 ## For Players:
- <TODO: nice screenshot> 
- 
+ <TODO: nice screenshot>
+
 1. Craft the compass as before using the crafting recipe.
    The new compass points to the origin / Zero point and is already usable.
 2. Punch the compass to a compatible node (all by default) and enter the target name
@@ -51,7 +51,7 @@ The mod support the next settings:
 
 4. Each time the compass is updated, a hook is called, if defined in other mod. The hook is usefull to implement wear or any other compass manipulation logic.
 ```
-    function ccompass.usage_hook(compass_stack, player) 
+    function ccompass.usage_hook(compass_stack, player)
         --do anything with compasS_stack
         return modified_compass_stack
     end

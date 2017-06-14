@@ -120,6 +120,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		local stack=player:get_wielded_item()
 		local meta=stack:get_meta()
 		local pos_string = meta:get_string("tmp_target_pos")
+		local pos = player:getpos()
 		meta:set_string("target_pos", pos_string)
 		meta:set_string("tmp_target_pos", "")
 		if fields.name == "" then
@@ -129,6 +130,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		end
 		player:set_wielded_item(stack)
 		minetest.chat_send_player(player:get_player_name(), "Calibration done to "..fields.name.." "..pos_string)
+		minetest.sound_play({ name = "ccompass_calibrate", gain = 1 }, { pos = pos, max_hear_distance = 3 })
 	end
 end)
 
