@@ -116,7 +116,7 @@ end
 
 -- Process the calibration using entered data
 minetest.register_on_player_receive_fields(function(player, formname, fields)
-	if formname == "ccompass" and fields.name and fields.ok then
+	if formname == "ccompass" and fields.name and (fields.ok or fields.key_enter) then
 		local stack=player:get_wielded_item()
 		local meta=stack:get_meta()
 		local pos_string = meta:get_string("tmp_target_pos")
@@ -128,6 +128,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			meta:set_string("description", "Compass to "..fields.name)
 		end
 		player:set_wielded_item(stack)
+		minetest.chat_send_player(player:get_player_name(), "Calibration done to "..fields.name.." "..pos_string)
 	end
 end)
 
