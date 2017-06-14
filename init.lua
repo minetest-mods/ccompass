@@ -1,5 +1,5 @@
 -- compass configuration interface - adjustable from other mods or minetest.conf settings
-local ccompass = {}
+ccompass = {}
 
 -- default target to static_spawnpoint or 0/0/0
 ccompass.default_target = minetest.setting_get_pos("static_spawnpoint") or {x=0, y=0, z=0}
