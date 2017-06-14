@@ -66,6 +66,9 @@ local function get_compass_stack(player, stack)
 	if metadata then
 		newstack:get_meta():from_table(metadata)
 	end
+	if ccompass.usage_hook then
+		newstack = ccompass.usage_hook(newstack, player) or newstack
+	end
 	return newstack
 end
 
