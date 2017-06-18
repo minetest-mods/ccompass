@@ -2,25 +2,25 @@
 ccompass = {}
 
 -- default target to static_spawnpoint or 0/0/0
-ccompass.default_target = minetest.setting_get_pos("static_spawnpoint") or {x=0, y=0, z=0}
+ccompass.default_target = minetest.settings:get_pos("static_spawnpoint") or {x=0, y=0, z=0}
 
 -- Re-calibration allowed
-ccompass.recalibrate = minetest.setting_getbool("ccompass_recalibrate")
+ccompass.recalibrate = minetest.settings:get_bool("ccompass_recalibrate")
 if ccompass.recalibrate == nil then
 	ccompass.recalibrate = true
 end
 
 -- Target restriction
-ccompass.restrict_target = minetest.setting_getbool("ccompass_restrict_target")
+ccompass.restrict_target = minetest.settings:get_bool("ccompass_restrict_target")
 ccompass.restrict_target_nodes = {}
-local nodes_setting = minetest.setting_get("ccompass_restrict_target_nodes")
+local nodes_setting = minetest.settings:get("ccompass_restrict_target_nodes")
 if nodes_setting then
 	nodes_setting:gsub("[^,]+", function(z)
 		ccompass.restrict_target_nodes[z] = true
 	end)
 end
 
-if minetest.setting_getbool("ccompass_aliasses") then
+if minetest.settings:get_bool("ccompass_aliasses") then
 	minetest.register_alias("compass:0", "ccompass:0")
 	minetest.register_alias("compass:1", "ccompass:1")
 	minetest.register_alias("compass:2", "ccompass:2")
