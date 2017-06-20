@@ -2,7 +2,7 @@
 ccompass = {}
 
 -- default target to static_spawnpoint or 0/0/0
-ccompass.default_target = minetest.settings:get_pos("static_spawnpoint") or {x=0, y=0, z=0}
+ccompass.default_target = minetest.setting_get_pos("static_spawnpoint") or {x=0, y=0, z=0}
 
 -- Re-calibration allowed
 ccompass.recalibrate = minetest.settings:get_bool("ccompass_recalibrate")
