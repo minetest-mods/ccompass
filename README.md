@@ -2,7 +2,7 @@
 
 This minetest mod adds a calibratable compass to the minetest. Original mod [here](https://forum.minetest.net/viewtopic.php?f=11&t=3785)
 
-  - License: Code: WTFPL, textures: CC BY-SA, sound: CC0.
+  - License: Code: MIT, textures: CC BY-SA, sound: CC0.
   - Dependencies to other mods: none
   - Forum: https://forum.minetest.net/viewtopic.php?f=9&t=17881
 
