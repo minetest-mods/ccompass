@@ -106,7 +106,7 @@ end
 local function get_compass_stack(player, stack)
 	local target = get_destination(player, stack)
 	local pos = player:getpos()
-	local dir = player:get_look_yaw()
+	local dir = player:get_look_horizontal() --changed because get_look_yaw() is decreped
 	local angle_north = math.deg(math.atan2(target.x - pos.x, target.z - pos.z))
 	if angle_north < 0 then
 		angle_north = angle_north + 360
