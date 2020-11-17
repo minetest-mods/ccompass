@@ -24,6 +24,7 @@ The mod support the next settings:
     ccompass_restrict_target_nodes: List of technical node names allowed for compass calibration, separated by ','
     ccompass_aliasses: If enabled the compas:* items will be aliased to the ccompass:* items for compatibility
     ccompass_teleport_nodes: List of technical node names that triggers the teleport to destination, separated by ','
+    ccompass_air_nodes: List of node names that must be above target for teleport to be executed. (separated by ',')
 
 
 ##  For developers:
@@ -34,6 +35,7 @@ The mod support the next settings:
 	ccompass.restrict_target = true
 	ccompass.restrict_target_nodes["schnitzeljagd:waypoint"] = true
 	ccompass.teleport_nodes["default:diamondblock"] = true
+	ccompass.air_nodes["bamboo:trunk"] = true
 ```
 
 2. The pointed node metadata will be checked for "waypoint_name" attribute. It this attribute is set, the calibration screen take this string as proposal. This can be used for a game specific calibration node. To get it working working just set in node definition something like
@@ -71,3 +73,4 @@ The mod support the next settings:
         return modified_compass_stack
     end
 ```
+

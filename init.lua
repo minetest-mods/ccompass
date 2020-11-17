@@ -29,6 +29,23 @@ if teleport_nodes_setting then
 else
 	ccompass.teleport_nodes["default:mese"] = true
 end
+-- Permited nodes above target
+ccompass.air_nodes = {}
+local air_nodes_setting = minetest.settings:get("ccompass_air_nodes")
+if air_nodes_setting then
+	air_nodes_setting:gsub("[^,]+", function(z)
+		ccompass.air_nodes[z] = true
+	end)
+else
+	ccompass.air_nodes["air"] = true
+	ccompass.air_nodes["bridger:scaffolding"] = true
+	ccompass.air_nodes["default:river_water_flowing"] = true
+	ccompass.air_nodes["default:river_water_source"] = true
+	ccompass.air_nodes["default:water_flowing"] = true
+	ccompass.air_nodes["default:water_source"] = true
+	ccompass.air_nodes["planet_mars:airlight"] = true
+	ccompass.air_nodes["vacuum:vacuum"] = true
+end
 
 if minetest.settings:get_bool("ccompass_aliasses") then
 	minetest.register_alias("compass:0", "ccompass:0")
@@ -93,17 +110,18 @@ local function teleport_above(playername, target, counter)
 			return
 		end
 
-		if nodename ~= 'air' then
-			target.y = target.y + 1
-		else
+		if ccompass.air_nodes[nodename] then
 			found_place = true
 			break
+		else
+			target.y = target.y + 1
 		end
 	end
+
 	if found_place then
 		player:setpos(target)
 	else
-		minetest.chat_send_player(playername, "Could not find air at target.")
+		minetest.chat_send_player(playername, "Could not find suitable surrounding at target.")
 	end
 end
 
