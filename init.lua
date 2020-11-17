@@ -84,6 +84,7 @@ local function teleport_above(playername, target, counter)
 		return
 	end
 
+	local found_place = false
 	for i = (counter or 1), 160 do
 		local nodename = minetest.get_node(target).name
 		if nodename == "ignore" then
@@ -95,11 +96,15 @@ local function teleport_above(playername, target, counter)
 		if nodename ~= 'air' then
 			target.y = target.y + 1
 		else
+			found_place = true
 			break
 		end
 	end
-	player:setpos(target)
-	return
+	if found_place then
+		player:setpos(target)
+	else
+		minetest.chat_send_player(playername, "Could not find air at target.")
+	end
 end
 
 -- get right image number for players compas
@@ -248,3 +253,4 @@ minetest.register_craft({
 		{'', 'default:steel_ingot', ''}
 	}
 })
+
