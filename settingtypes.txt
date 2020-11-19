@@ -12,3 +12,12 @@ ccompass_aliasses (Enable compatibility aliasses) bool false
 
 # Nodes able to teleport to destination on punch, separated by ','
 ccompass_teleport_nodes (Nodes list for teleport on punch) string default:mese
+
+# If one of these nodes is at target, skip other checks and allow teleporting.
+# String list of node names separated by ','
+ccompass_nodes_over_target_allow (Nodes list for additional allowed nodes) string
+
+# If one of these nodes is at target, skip other checks and deny teleporting.
+# String list of node names separated by ','
+ccompass_nodes_over_target_deny (Nodes list for additional deny nodes) string
+

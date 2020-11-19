@@ -30,21 +30,20 @@ else
 	ccompass.teleport_nodes["default:mese"] = true
 end
 -- Permited nodes above target
-ccompass.air_nodes = {}
-local air_nodes_setting = minetest.settings:get("ccompass_air_nodes")
-if air_nodes_setting then
-	air_nodes_setting:gsub("[^,]+", function(z)
-		ccompass.air_nodes[z] = true
+ccompass.nodes_over_target_allow = {}
+nodes_setting = minetest.settings:get("ccompass_nodes_over_target_allow")
+if nodes_setting then
+	nodes_setting:gsub("[^,]+", function(z)
+		ccompass.nodes_over_target_allow[z] = true
 	end)
-else
-	ccompass.air_nodes["air"] = true
-	ccompass.air_nodes["bridger:scaffolding"] = true
-	ccompass.air_nodes["default:river_water_flowing"] = true
-	ccompass.air_nodes["default:river_water_source"] = true
-	ccompass.air_nodes["default:water_flowing"] = true
-	ccompass.air_nodes["default:water_source"] = true
-	ccompass.air_nodes["planet_mars:airlight"] = true
-	ccompass.air_nodes["vacuum:vacuum"] = true
+end
+-- Not permited nodes above target
+ccompass.nodes_over_target_deny = {}
+nodes_setting = minetest.settings:get("ccompass_nodes_over_target_deny")
+if nodes_setting then
+	nodes_setting:gsub("[^,]+", function(z)
+		ccompass.nodes_over_target_deny[z] = true
+	end)
 end
 
 if minetest.settings:get_bool("ccompass_aliasses") then
@@ -95,6 +94,32 @@ local function get_destination(player, stack)
 	end
 end
 
+function ccompass.is_safe_target(target, nodename)
+	local node_def = minetest.registered_nodes[nodename]
+	-- unknown node: not dangerous but probably best treated as one
+	if not node_def then return false end
+	-- white-list
+	if ccompass.nodes_over_target_allow[nodename] then return true end
+	-- black-list
+	if ccompass.nodes_over_target_deny[nodename] then return false end
+	-- damaging node
+	if node_def.damage_per_second and 0 < node_def.damage_per_second then
+		return false
+	end
+	-- deeper checks
+	local is_good_draw_type = {
+		airlike = true,
+		flowingliquid = true,
+		liquid = true,
+		plantlike = true,
+		plantlike_rooted = true,
+	}
+	if is_good_draw_type[node_def.drawtype] then return true end
+
+	-- anything else is assumed dangerous
+	return false
+end
+
 local function teleport_above(playername, target, counter)
 	local player = minetest.get_player_by_name(playername)
 	if not player then
@@ -102,15 +127,15 @@ local function teleport_above(playername, target, counter)
 	end
 
 	local found_place = false
+	local nodename
 	for i = (counter or 1), 160 do
-		local nodename = minetest.get_node(target).name
+		nodename = minetest.get_node(target).name
 		if nodename == "ignore" then
 			minetest.emerge_area(target, target)
 			minetest.after(0.1, teleport_above, playername, target, i)
 			return
 		end
-
-		if ccompass.air_nodes[nodename] then
+		if ccompass.is_safe_target(target, nodename) then
 			found_place = true
 			break
 		else
