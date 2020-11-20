@@ -106,6 +106,8 @@ function ccompass.is_safe_target(target, nodename)
 	if node_def.damage_per_second and 0 < node_def.damage_per_second then
 		return false
 	end
+	-- climbable nodes are ok
+	if node_def.climbable then return true end
 	-- deeper checks
 	local is_good_draw_type = {
 		airlike = true,
