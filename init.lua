@@ -19,6 +19,9 @@ if nodes_setting then
 		ccompass.restrict_target_nodes[z] = true
 	end)
 end
+
+ccompass.allow_climbable_target = not minetest.settings:get_bool("ccompass_deny_climbable_target")
+
 -- Teleport targets
 ccompass.teleport_nodes = {}
 local teleport_nodes_setting = minetest.settings:get("ccompass_teleport_nodes")
@@ -44,6 +47,22 @@ if nodes_setting then
 	nodes_setting:gsub("[^,]+", function(z)
 		ccompass.nodes_over_target_deny[z] = true
 	end)
+end
+-- Permited drawtype of nodes above target
+ccompass.nodes_over_target_allow_drawtypes = {}
+nodes_setting = minetest.settings:get("ccompass_nodes_over_target_allow_drawtypes")
+if nodes_setting then
+	nodes_setting:gsub("[^,]+", function(z)
+		ccompass.nodes_over_target_allow_drawtypes[z] = true
+	end)
+else
+	ccompass.nodes_over_target_allow_drawtypes = {
+		airlike = true,
+		flowingliquid = true,
+		liquid = true,
+		plantlike = true,
+		plantlike_rooted = true,
+	}
 end
 
 if minetest.settings:get_bool("ccompass_aliasses") then
@@ -106,20 +125,32 @@ function ccompass.is_safe_target(target, nodename)
 	if node_def.damage_per_second and 0 < node_def.damage_per_second then
 		return false
 	end
-	-- climbable nodes are ok
-	if node_def.climbable then return true end
+	-- climbable nodes are ok depending on settings
+	if ccompass.allow_climbable_target and node_def.climbable then return true end
 	-- deeper checks
-	local is_good_draw_type = {
-		airlike = true,
-		flowingliquid = true,
-		liquid = true,
-		plantlike = true,
-		plantlike_rooted = true,
-	}
+	local is_good_draw_type = ccompass.nodes_over_target_allow_drawtypes
 	if is_good_draw_type[node_def.drawtype] then return true end
 
 	-- anything else is assumed dangerous
 	return false
+end
+
+function ccompass.is_safe_target_under(target, nodename)
+	-- for games with target node restriction
+	if ccompass.restrict_target and not ccompass.restrict_target_nodes[nodename] then
+		return false
+	end
+
+	local node_def = minetest.registered_nodes[nodename]
+	-- unknown node: not dangerous but probably best treated as one
+	if not node_def then return false end
+	-- damaging node
+	if node_def.damage_per_second and 0 < node_def.damage_per_second then
+		return false
+	end
+
+	-- anything else is assumed safe
+	return true
 end
 
 local function teleport_above(playername, target, counter)
@@ -129,7 +160,8 @@ local function teleport_above(playername, target, counter)
 	end
 
 	local found_place = false
-	local nodename
+	local nodename, nodename_head, nodename_under
+	local target_head, target_under
 	for i = (counter or 1), 160 do
 		nodename = minetest.get_node(target).name
 		if nodename == "ignore" then
@@ -137,7 +169,27 @@ local function teleport_above(playername, target, counter)
 			minetest.after(0.1, teleport_above, playername, target, i)
 			return
 		end
-		if ccompass.is_safe_target(target, nodename) then
+
+		target_head = { x = target.x, y = target.y + 1, z = target.z }
+		nodename_head = minetest.get_node(target_head).name
+		if nodename_head == "ignore" then
+			minetest.emerge_area(target_head, target_head)
+			minetest.after(0.1, teleport_above, playername, target, i)
+			return
+		end
+
+		target_under = { x = target.x, y = target.y - 1, z = target.z }
+		nodename_under = minetest.get_node(target_under).name
+		if nodename_under == "ignore" then
+			minetest.emerge_area(target_under, target_under)
+			minetest.after(0.1, teleport_above, playername, target, i)
+			return
+		end
+
+		if ccompass.is_safe_target(target, nodename)
+			and ccompass.is_safe_target(target_head, nodename_head)
+			and ccompass.is_safe_target_under(target_under, nodename_under)
+		then
 			found_place = true
 			break
 		else
