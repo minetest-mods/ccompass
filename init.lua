@@ -21,6 +21,7 @@ if nodes_setting then
 end
 
 ccompass.allow_climbable_target = not minetest.settings:get_bool("ccompass_deny_climbable_target")
+ccompass.allow_damaging_target = minetest.settings:get_bool("ccompass_allow_damage_target")
 
 -- Teleport targets
 ccompass.teleport_nodes = {}
@@ -122,8 +123,10 @@ function ccompass.is_safe_target(target, nodename)
 	-- black-list
 	if ccompass.nodes_over_target_deny[nodename] then return false end
 	-- damaging node
-	if node_def.damage_per_second and 0 < node_def.damage_per_second then
-		return false
+	if not ccompass.allow_damaging_target then
+		if node_def.damage_per_second and 0 < node_def.damage_per_second then
+			return false
+		end
 	end
 	-- climbable nodes are ok depending on settings
 	if ccompass.allow_climbable_target and node_def.climbable then return true end
@@ -145,8 +148,10 @@ function ccompass.is_safe_target_under(target, nodename)
 	-- unknown node: not dangerous but probably best treated as one
 	if not node_def then return false end
 	-- damaging node
-	if node_def.damage_per_second and 0 < node_def.damage_per_second then
-		return false
+	if not ccompass.allow_damaging_target then
+		if node_def.damage_per_second and 0 < node_def.damage_per_second then
+			return false
+		end
 	end
 
 	-- anything else is assumed safe

@@ -28,6 +28,7 @@ The mod support the next settings:
     ccompass_nodes_over_target_deny: List of additional node names that must NOT be above target for teleport to be executed. (separated by ',')
     ccompass_nodes_over_target_allow_drawtypes: List of drawtypes to allow to be over target. Defaults are: airlike, flowingliquid, liquid, plantlike and plantlike_rooted
     ccompass_deny_climbable_target: Disabled by default -> allows climbable nodes to be over target. Set to true to not allow them.
+    ccompass_allow_damage_target: Disabled by default -> will not teleport player into or over damaging nodes.
 
 ##  For developers:
 1. It is possible to change compass settings from other mods by changing values in global table ccompass. So it is possible for example to add a waypoint node to the target-nodes by
@@ -41,6 +42,7 @@ The mod support the next settings:
 	ccompass.nodes_over_target_deny["tnt:boom"] = true
 	ccompass.nodes_over_target_allow_drawtypes["liquid"] = nil
 	ccompass.allow_climbable_target = false
+	ccompass.allow_damaging_target = true
 ```
 Also you can override ccompass.is_safe_target(target, nodename) for more granular checks.
 By default first nodes_over_target_allow is checked, then nodes_over_target_deny

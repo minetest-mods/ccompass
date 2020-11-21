@@ -29,3 +29,7 @@ ccompass_nodes_over_target_deny (Nodes list for additional deny nodes) string
 # String list of node names separated by ','
 ccompass_nodes_over_target_allow_drawtypes (Drawtypes of nodes allowed over target) string airlike,flowingliquid,liquid,plantlike,plantlike_rooted
 
+# By default ccompass will not teleport players into or over damaging nodes.
+# To allow this, change to true.
+ccompass_allow_damage_target (Enable to allow teleporting into damaging nodes) bool false
+
