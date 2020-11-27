@@ -139,11 +139,6 @@ function ccompass.is_safe_target(target, nodename)
 end
 
 function ccompass.is_safe_target_under(target, nodename)
-	-- for games with target node restriction
-	if ccompass.restrict_target and not ccompass.restrict_target_nodes[nodename] then
-		return false
-	end
-
 	local node_def = minetest.registered_nodes[nodename]
 	-- unknown node: not dangerous but probably best treated as one
 	if not node_def then return false end
