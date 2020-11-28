@@ -148,9 +148,13 @@ function ccompass.is_safe_target_under(target, nodename)
 			return false
 		end
 	end
+	-- climbable nodes are ok depending on settings
+	if ccompass.allow_climbable_target and node_def.climbable then return true end
+	-- solid / walkable
+	if node_def.walkable then return true end
 
-	-- anything else is assumed safe
-	return true
+	-- anything else is assumed unsafe
+	return false
 end
 
 local function teleport_above(playername, target, counter)
