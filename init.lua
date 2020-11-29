@@ -166,45 +166,48 @@ local function teleport_above(playername, target, counter)
 	local found_place = false
 	local nodename, nodename_head, nodename_under
 	local nodename_prev, nodename_head_prev, nodename_under_prev
-	local target_head, target_under
-	for i = (counter or 1), 160 do
-		nodename = nodename_head_prev or minetest.get_node(target).name
+	local cur_target_head  = { x = target.x, z = target.z } -- z is handled in loop
+	local cur_target       = { x = target.x, z = target.z }
+	local cur_target_under = { x = target.x, z = target.z }
+
+	for i = (counter or 80), -80, -1 do
+		cur_target.y = target.y + i
+		nodename = nodename_under_prev or minetest.get_node(cur_target).name
 		if nodename == "ignore" then
-			minetest.emerge_area(target, target)
+			minetest.emerge_area(cur_target, cur_target)
 			minetest.after(0.1, teleport_above, playername, target, i)
 			return
 		end
 
-		target_head = { x = target.x, y = target.y + 1, z = target.z }
-		nodename_head = minetest.get_node(target_head).name
+		cur_target_head.y = target.y + i + 1
+		nodename_head = nodename_prev or minetest.get_node(cur_target_head).name
 		if nodename_head == "ignore" then
-			minetest.emerge_area(target_head, target_head)
+			minetest.emerge_area(cur_target_head, cur_target_head)
 			minetest.after(0.1, teleport_above, playername, target, i)
 			return
 		end
 
-		target_under = { x = target.x, y = target.y - 1, z = target.z }
-		nodename_under = nodename_prev or minetest.get_node(target_under).name
+		cur_target_under.y = target.y + i - 1
+		nodename_under = minetest.get_node(cur_target_under).name
 		if nodename_under == "ignore" then
-			minetest.emerge_area(target_under, target_under)
+			minetest.emerge_area(cur_target_under, cur_target_under)
 			minetest.after(0.1, teleport_above, playername, target, i)
 			return
 		end
 
-		if ccompass.is_safe_target(target, nodename)
-			and ccompass.is_safe_target(target_head, nodename_head)
-			and ccompass.is_safe_target_under(target_under, nodename_under)
+		if ccompass.is_safe_target(cur_target, nodename)
+			and ccompass.is_safe_target(cur_target_head, nodename_head)
+			and ccompass.is_safe_target_under(cur_target_under, nodename_under)
 		then
 			found_place = true
 			break
 		else
-			target.y = target.y + 1
 			nodename_prev, nodename_head_prev, nodename_under_prev = nodename, nodename_head, nodename_under
 		end
 	end
 
 	if found_place then
-		player:setpos(target)
+		player:set_pos(cur_target)
 	else
 		minetest.chat_send_player(playername, "Could not find suitable surrounding at target.")
 	end
