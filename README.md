@@ -24,7 +24,11 @@ The mod support the next settings:
     ccompass_restrict_target_nodes: List of technical node names allowed for compass calibration, separated by ','
     ccompass_aliasses: If enabled the compas:* items will be aliased to the ccompass:* items for compatibility
     ccompass_teleport_nodes: List of technical node names that triggers the teleport to destination, separated by ','
-
+    ccompass_nodes_over_target_allow: List of additional node names that must be above target for teleport to be executed. (separated by ',')
+    ccompass_nodes_over_target_deny: List of additional node names that must NOT be above target for teleport to be executed. (separated by ',')
+    ccompass_nodes_over_target_allow_drawtypes: List of drawtypes to allow to be over target. Defaults are: airlike, flowingliquid, liquid, plantlike and plantlike_rooted
+    ccompass_deny_climbable_target: Disabled by default -> allows climbable nodes to be over target. Set to true to not allow them.
+    ccompass_allow_damage_target: Disabled by default -> will not teleport player into or over damaging nodes.
 
 ##  For developers:
 1. It is possible to change compass settings from other mods by changing values in global table ccompass. So it is possible for example to add a waypoint node to the target-nodes by
@@ -34,7 +38,18 @@ The mod support the next settings:
 	ccompass.restrict_target = true
 	ccompass.restrict_target_nodes["schnitzeljagd:waypoint"] = true
 	ccompass.teleport_nodes["default:diamondblock"] = true
+	ccompass.nodes_over_target_allow["vacuum:vacuum"] = true
+	ccompass.nodes_over_target_deny["tnt:boom"] = true
+	ccompass.nodes_over_target_allow_drawtypes["liquid"] = nil
+	ccompass.allow_climbable_target = false
+	ccompass.allow_damaging_target = true
 ```
+Also you can override ccompass.is_safe_target(target, nodename) for more granular checks.
+By default first nodes_over_target_allow is checked, then nodes_over_target_deny
+and finally nodes are checked for damaging and airlike drawtype.
+
+Similarly you can override ccompass.is_safe_target_under(target, nodename) for
+more granular checks on what is under players feet.
 
 2. The pointed node metadata will be checked for "waypoint_name" attribute. It this attribute is set, the calibration screen take this string as proposal. This can be used for a game specific calibration node. To get it working working just set in node definition something like
 
@@ -71,3 +86,4 @@ The mod support the next settings:
         return modified_compass_stack
     end
 ```
+
