@@ -165,9 +165,10 @@ local function teleport_above(playername, target, counter)
 
 	local found_place = false
 	local nodename, nodename_head, nodename_under
+	local nodename_prev, nodename_head_prev, nodename_under_prev
 	local target_head, target_under
 	for i = (counter or 1), 160 do
-		nodename = minetest.get_node(target).name
+		nodename = nodename_head_prev or minetest.get_node(target).name
 		if nodename == "ignore" then
 			minetest.emerge_area(target, target)
 			minetest.after(0.1, teleport_above, playername, target, i)
@@ -183,7 +184,7 @@ local function teleport_above(playername, target, counter)
 		end
 
 		target_under = { x = target.x, y = target.y - 1, z = target.z }
-		nodename_under = minetest.get_node(target_under).name
+		nodename_under = nodename_prev or minetest.get_node(target_under).name
 		if nodename_under == "ignore" then
 			minetest.emerge_area(target_under, target_under)
 			minetest.after(0.1, teleport_above, playername, target, i)
@@ -198,6 +199,7 @@ local function teleport_above(playername, target, counter)
 			break
 		else
 			target.y = target.y + 1
+			nodename_prev, nodename_head_prev, nodename_under_prev = nodename, nodename_head, nodename_under
 		end
 	end
 
