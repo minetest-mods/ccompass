@@ -157,6 +157,32 @@ function ccompass.is_safe_target_under(target, nodename)
 	return false
 end
 
+local function check_target(cur_target, nodenames_cache)
+	--check target
+	local nodename = nodenames_cache[cur_target.y] or minetest.get_node(cur_target).name
+	if nodename == "ignore" then return false end
+	nodenames_cache[cur_target.y] = nodename
+	if ccompass.is_safe_target(cur_target, nodename) then
+
+		-- Check under
+		cur_target.y = cur_target.y - 1
+		nodename = nodenames_cache[cur_target.y] or minetest.get_node(cur_target).name
+		if nodename == "ignore" then return false end
+		nodenames_cache[cur_target.y] = nodename
+		if ccompass.is_safe_target_under(cur_target, nodename) then
+
+			-- Check head
+			cur_target.y = cur_target.y + 2
+			nodename = nodenames_cache[cur_target.y] or minetest.get_node(cur_target).name
+			if nodename == "ignore" then return false end
+			nodenames_cache[cur_target.y] = nodename
+			if ccompass.is_safe_target(cur_target, nodename) then
+				return true
+			end
+		end
+	end
+end
+
 local function teleport_above(playername, target, counter)
 	local player = minetest.get_player_by_name(playername)
 	if not player then
@@ -164,45 +190,35 @@ local function teleport_above(playername, target, counter)
 	end
 
 	local found_place = false
-	local nodename, nodename_head, nodename_under
-	local nodename_prev, nodename_head_prev, nodename_under_prev
-	local cur_target_head  = { x = target.x, z = target.z } -- z is handled in loop
-	local cur_target       = { x = target.x, z = target.z }
-	local cur_target_under = { x = target.x, z = target.z }
+	local cur_target = { x = target.x, z = target.z } -- y is handled in loop
 
-	for i = (counter or 80), -80, -1 do
+	local nodenames_cache = {}
+
+	for i = (counter or 0), 80 do
+		-- Search above
 		cur_target.y = target.y + i
-		nodename = nodename_under_prev or minetest.get_node(cur_target).name
-		if nodename == "ignore" then
+		found_place  = check_target(cur_target, nodenames_cache)
+		if found_place == false then
 			minetest.emerge_area(cur_target, cur_target)
 			minetest.after(0.1, teleport_above, playername, target, i)
 			return
-		end
-
-		cur_target_head.y = target.y + i + 1
-		nodename_head = nodename_prev or minetest.get_node(cur_target_head).name
-		if nodename_head == "ignore" then
-			minetest.emerge_area(cur_target_head, cur_target_head)
-			minetest.after(0.1, teleport_above, playername, target, i)
-			return
-		end
-
-		cur_target_under.y = target.y + i - 1
-		nodename_under = minetest.get_node(cur_target_under).name
-		if nodename_under == "ignore" then
-			minetest.emerge_area(cur_target_under, cur_target_under)
-			minetest.after(0.1, teleport_above, playername, target, i)
-			return
-		end
-
-		if ccompass.is_safe_target(cur_target, nodename)
-			and ccompass.is_safe_target(cur_target_head, nodename_head)
-			and ccompass.is_safe_target_under(cur_target_under, nodename_under)
-		then
-			found_place = true
+		elseif found_place == true then
+			cur_target.y = target.y + i -- reset after check_target
 			break
-		else
-			nodename_prev, nodename_head_prev, nodename_under_prev = nodename, nodename_head, nodename_under
+		end
+
+		if i > 0 then
+			-- Search bellow
+			cur_target.y = target.y - i
+			found_place  = check_target(cur_target, nodenames_cache)
+			if found_place == false then
+				minetest.emerge_area(cur_target, cur_target)
+				minetest.after(0.1, teleport_above, playername, target, i)
+				return
+			elseif found_place == true then
+				cur_target.y = target.y - i  -- reset after check_target
+				break
+			end
 		end
 	end
 
@@ -216,7 +232,7 @@ end
 -- get right image number for players compas
 local function get_compass_stack(player, stack)
 	local target = get_destination(player, stack)
-	local pos = player:getpos()
+	local pos = player:get_pos()
 	local dir = player:get_look_horizontal()
 	local angle_north = math.deg(math.atan2(target.x - pos.x, target.z - pos.z))
 	if angle_north < 0 then
@@ -284,7 +300,6 @@ local function on_use_function(itemstack, player, pointed_thing)
 	if waypoint_pos and waypoint_pos ~= "" then
 		nodepos_string = waypoint_pos
 	end
-
 
 	if skip_namechange ~= "" then
 		ccompass.set_target(itemstack, {
@@ -359,4 +374,3 @@ minetest.register_craft({
 		{'', 'default:steel_ingot', ''}
 	}
 })
-
