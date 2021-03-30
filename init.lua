@@ -357,12 +357,19 @@ for i = 0, 15 do
 	if i > 0 then
 		groups.not_in_creative_inventory = 1
 	end
-	minetest.register_tool("ccompass:"..i, {
+	local itemname = "ccompass:"..i
+	minetest.register_tool(itemname, {
 		description = "Compass",
 		inventory_image = image,
 		wield_image = image,
 		groups = groups,
 		on_use = on_use_function,
+	})
+	-- reset recipe
+	minetest.register_craft({
+		type = "shapeless",
+		output = "ccompass:0",
+		recipe = { itemname }
 	})
 end
 
@@ -374,3 +381,4 @@ minetest.register_craft({
 		{'', 'default:steel_ingot', ''}
 	}
 })
+
