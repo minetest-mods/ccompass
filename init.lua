@@ -66,6 +66,10 @@ else
 	}
 end
 
+-- default to legacy behaviour
+ccompass.stack_max = tonumber(minetest.settings:get("ccompass_stack_max") or 1) or 1
+ccompass.allow_using_stacks = minetest.settings:get_bool("ccompass_allow_using_stacks")
+
 if minetest.settings:get_bool("ccompass_aliasses") then
 	minetest.register_alias("compass:0", "ccompass:0")
 	minetest.register_alias("compass:1", "ccompass:1")
