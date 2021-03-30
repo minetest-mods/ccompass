@@ -229,7 +229,7 @@ local function teleport_above(playername, target, counter)
 	end
 end
 
--- get right image number for players compas
+-- get right image number for players compass
 local function get_compass_stack(player, stack)
 	local target = get_destination(player, stack)
 	local pos = player:get_pos()
