@@ -245,7 +245,7 @@ local function get_compass_stack(player, stack)
 	-- create new stack with metadata copied
 	local metadata = stack:get_meta():to_table()
 
-	local newstack = ItemStack("ccompass:"..compass_image)
+	local newstack = ItemStack("ccompass:"..compass_image.." "..stack:get_count())
 	if metadata then
 		newstack:get_meta():from_table(metadata)
 	end
@@ -257,6 +257,11 @@ end
 
 -- Calibrate compass on pointed_thing
 local function on_use_function(itemstack, player, pointed_thing)
+	-- if using with a bunch together, need to check server preference
+	if 1 ~= itemstack:get_count() and not ccompass.allow_using_stacks then
+		minetest.chat_send_player(player:get_player_name(), "Use a single compass.")
+		return
+	end
 	-- possible only on nodes
 	if pointed_thing.type ~= "node" then --support nodes only for destination
 		minetest.chat_send_player(player:get_player_name(), "Calibration can be done on nodes only")
@@ -358,10 +363,11 @@ for i = 0, 15 do
 		groups.not_in_creative_inventory = 1
 	end
 	local itemname = "ccompass:"..i
-	minetest.register_tool(itemname, {
+	minetest.register_craftitem(itemname, {
 		description = "Compass",
 		inventory_image = image,
 		wield_image = image,
+		stack_max = ccompass.stack_max or 42,
 		groups = groups,
 		on_use = on_use_function,
 	})

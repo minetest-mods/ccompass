@@ -15,6 +15,8 @@ This minetest mod adds a calibratable compass to the minetest. Original mod [her
 3. Now this compass leads you allways to this location. You can give it away to allow other users to find this place.
 4. Punch a teleport compatible node (by default mese block) to teleport back to the calibrated place
 
+Depending on servers many aspects can be different, see below.
+
 ## For server owners:
 The mod support the next settings:
 
@@ -44,6 +46,8 @@ The mod support the next settings:
 	ccompass.nodes_over_target_allow_drawtypes["liquid"] = nil
 	ccompass.allow_climbable_target = false
 	ccompass.allow_damaging_target = true
+	ccompass.allow_using_stacks = true
+	ccompass.stack_max = 1
 ```
 Also you can override ccompass.is_safe_target(target, nodename) for more granular checks.
 By default first nodes_over_target_allow is checked, then nodes_over_target_deny
@@ -63,7 +67,7 @@ more granular checks on what is under players feet.
           end,
 ```
 
-3. It is possible to create pre-calibrated compasses trough other mods. Just write the position to the Itemstack meta:
+3. It is possible to create pre-calibrated compasses through other mods. Just write the position to the Itemstack meta:
 
 ```
     stack:get_meta():set_string("target_pos", minetest.pos_to_string(pos))
@@ -87,4 +91,8 @@ more granular checks on what is under players feet.
         return modified_compass_stack
     end
 ```
+
+5. Setting ccompass.stack_max to 1 restores behaviour prior to stackable feature.
+Or going the other way: set ccompass.stack_max to 777 and also set ccompass.allow_using_stacks to true.
+This would allow players to make a big number of copies at once.
 
