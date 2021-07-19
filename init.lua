@@ -391,4 +391,13 @@ minetest.register_craft({
 		{'', 'default:steel_ingot', ''}
 	}
 })
+-- add an alternative recipe
+minetest.register_craft({
+	output = 'ccompass:0',
+	recipe = {
+		{'default:steel_ingot', '', 'default:steel_ingot'},
+		{'', 'default:mese_crystal_fragment', ''},
+		{'default:steel_ingot', '', 'default:steel_ingot'}
+	}
+})
 
