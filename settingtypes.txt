@@ -35,7 +35,7 @@ ccompass_allow_damage_target (Enable to allow teleporting into damaging nodes) b
 
 # Maximum size of compass stacks. Only identical and same direction pointing compasses can be stacked.
 # Defaults to 1
-ccompass_stack_max (Sets maximum stack size) 1 1 65535
+ccompass_stack_max (Sets maximum stack size) int 1 1 65535
 # Requires stack_max greater than 1. When true, allows a whole stack to be calibrated at the same time.
 ccompass_allow_using_stacks (Enable to allow callibrating stacks) bool false
 
