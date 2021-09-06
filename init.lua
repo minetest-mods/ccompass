@@ -70,6 +70,8 @@ end
 ccompass.stack_max = tonumber(minetest.settings:get("ccompass_stack_max") or 1) or 1
 ccompass.allow_using_stacks = minetest.settings:get_bool("ccompass_allow_using_stacks")
 
+ccompass.idle_interval = tonumber(minetest.settings:get("ccompass_idle_interval") or 1) or 1
+
 if minetest.settings:get_bool("ccompass_aliasses") then
 	minetest.register_alias("compass:0", "ccompass:0")
 	minetest.register_alias("compass:1", "ccompass:1")
@@ -344,7 +346,8 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 end)
 
 -- update inventory
-minetest.register_globalstep(function(dtime)
+local function do_update_loop()
+	local found_compasses = false
 	for i,player in ipairs(minetest.get_connected_players()) do
 		if player:get_inventory() then
 			for i,stack in ipairs(player:get_inventory():get_list("main")) do
@@ -352,12 +355,17 @@ minetest.register_globalstep(function(dtime)
 					break
 				end
 				if string.sub(stack:get_name(), 0, 9) == "ccompass:" then
+					found_compasses = true
 					player:get_inventory():set_stack("main", i, get_compass_stack(player, stack))
 				end
 			end
 		end
 	end
-end)
+	-- if no compasses were found, idle for a time before checking again
+	local interval = found_compasses and 0 or ccompass.idle_interval
+	minetest.after(interval, do_update_loop)
+end
+minetest.after(0, do_update_loop)
 
 -- register items
 for i = 0, 15 do
