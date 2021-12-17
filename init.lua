@@ -345,9 +345,15 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	end
 end)
 
--- update inventory
-local function do_update_loop()
-	local found_compasses = false
+-- register globalstep for updating compass directions
+local timer = 0
+minetest.register_globalstep(function(dtime)
+	timer = timer - dtime
+	if timer > 0 then return end
+
+	timer = ccompass.idle_interval
+
+	-- update compasses and schedule another check for the next step if any are found
 	for i,player in ipairs(minetest.get_connected_players()) do
 		if player:get_inventory() then
 			for i,stack in ipairs(player:get_inventory():get_list("main")) do
@@ -355,17 +361,13 @@ local function do_update_loop()
 					break
 				end
 				if string.sub(stack:get_name(), 0, 9) == "ccompass:" then
-					found_compasses = true
+					timer = 0
 					player:get_inventory():set_stack("main", i, get_compass_stack(player, stack))
 				end
 			end
 		end
 	end
-	-- if no compasses were found, idle for a time before checking again
-	local interval = found_compasses and 0 or ccompass.idle_interval
-	minetest.after(interval, do_update_loop)
-end
-minetest.after(0, do_update_loop)
+end)
 
 -- register items
 for i = 0, 15 do
